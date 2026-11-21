@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>運転適性診断書 入力フォーム｜全国ペーパードライバー協会</title>
+<style>
+  :root { --dark:#3d3d3d; --line:#9a9a9a; --zebra:#f1f1f1; --accent:#1a6b4a; }
+  * { box-sizing: border-box; }
+  body { font-family: "Hiragino Kaku Gothic ProN", "Noto Sans CJK JP", sans-serif; margin: 0; background: #f4f4f4; color: #222; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 16px 14px 40px; background: #fff; min-height: 100vh; }
+  h1 { font-size: 20px; text-align: center; margin: 6px 0 2px; letter-spacing: 2px; }
+  .sub { text-align: center; color: #555; font-size: 13px; margin: 0 0 14px; }
+  h2 { font-size: 15px; margin: 22px 0 8px; }
+  label.f { display: block; font-size: 12px; color: #555; margin: 10px 0 4px; }
+  input[type=text], input[type=date], select, textarea {
+    width: 100%; font-size: 16px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 6px; background: #fff;
+  }
+  textarea { min-height: 84px; line-height: 1.6; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+  .cat { margin-top: 16px; }
+  .cat-title { font-size: 14px; margin: 0 0 6px; }
+  .item { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid #e3e3e3; }
+  .item .name { flex: 1; font-size: 14px; }
+  .seg { display: flex; gap: 4px; }
+  .seg button {
+    width: 40px; height: 40px; font-size: 15px; border: 1px solid var(--line); background: #fff; border-radius: 6px; cursor: pointer;
+  }
+  .seg button.on { background: var(--dark); color: #fff; border-color: var(--dark); font-weight: 700; }
+  .seg3 button { width: auto; padding: 0 12px; font-size: 13px; }
+  .subtotal { text-align: right; font-size: 13px; color: #444; padding-top: 5px; }
+  .total-box { background: var(--zebra); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin-top: 18px; }
+  .total-box .big { font-size: 22px; font-weight: 700; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .row > div { flex: 1; min-width: 140px; }
+  .actions { margin-top: 24px; display: grid; gap: 10px; }
+  button.act { font-size: 16px; padding: 13px; border-radius: 8px; border: 1px solid var(--dark); background: #fff; cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
+  .note { font-size: 12px; color: #666; line-height: 1.6; }
+  .msg { font-size: 14px; padding: 10px; border-radius: 6px; display: none; }
+  .msg.ok { display: block; background: #e6f4ec; color: #14532d; }
+  .msg.err { display: block; background: #fdeaea; color: #7f1d1d; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>運転適性診断書 入力フォーム</h1>
+  <p class="sub">全国ペーパードライバー協会</p>
+
+  <h2>■ 基本情報</h2>
+  <label class="f">会社名（支店まで）</label>
+  <input type="text" id="company" placeholder="例：積水ハウス株式会社 大阪南支店">
+  <div class="grid2">
+    <div><label class="f">会社名（短縮・診断書の右上表示）</label><input type="text" id="company_short" placeholder="例：積水ハウス株式会社"></div>
+    <div><label class="f">所属部署</label><input type="text" id="department" placeholder="例：建築"></div>
+    <div><label class="f">受診者 氏名</label><input type="text" id="name" placeholder="例：北野 元希"></div>
+    <div><label class="f">診断日</label><input type="date" id="date"></div>
+    <div><label class="f">診断担当者</label><input type="text" id="instructor" placeholder="例：志村 太陽"></div>
+  </div>
+
+  <h2>■ 評価項目（タップで採点）</h2>
+  <div id="categories"></div>
+
+  <div class="total-box">
+    <div>合計得点　<span class="big" id="total">0</span> 点 / 100点</div>
+    <div class="row" style="margin-top:8px;">
+      <div><label class="f">評価ランク（自動）</label><input type="text" id="rank" readonly></div>
+      <div><label class="f">事故リスク</label>
+        <select id="risk"><option>低</option><option>中</option><option>高</option></select></div>
+      <div><label class="f">総合適性</label>
+        <select id="apt_summary"><option>良好</option><option>概ね良好</option><option>要改善</option><option>要指導</option><option>要制限</option></select></div>
+    </div>
+    <p class="note">事故リスクと総合適性はランクに応じて自動で初期値が入ります。必要に応じて変更してください。</p>
+  </div>
+
+  <h2>■ 運転適性評価</h2>
+  <div id="aptitude"></div>
+  <div class="item"><span class="name">判断傾向</span><span class="seg seg3" data-apt="tendency"></span></div>
+
+  <h2>■ コメント</h2>
+  <label class="f">講習評価</label><textarea id="c1"></textarea>
+  <label class="f">課題事項</label><textarea id="c2"></textarea>
+  <label class="f">留意事項</label><textarea id="c3"></textarea>
+  <label class="f">総合評価</label><textarea id="c4"></textarea>
+
+  <h2>■ 送信</h2>
+  <label class="f">送信先URL（蓮の受け取り用・設定済みの場合はそのまま）</label>
+  <input type="text" id="endpoint" placeholder="https://script.google.com/macros/s/...">
+  <div class="actions">
+    <button class="act primary" id="send">送信する</button>
+    <button class="act" id="copy">データをコピー（JSON）</button>
+    <button class="act" id="download">データをダウンロード（JSON）</button>
+  </div>
+  <p class="msg" id="msg"></p>
+  <p class="note">送信すると、入力内容が蓮に届き、協会様式の診断書PDFが作成されます。送信先URLが未設定の場合は、コピーまたはダウンロードでデータを渡してください。</p>
+</div>
+
+<script>
+const CATEGORIES = [
+  { label: "① 運転技術（20点）", items: ["発進・停止", "ハンドル操作", "車両感覚", "駐車"] },
+  { label: "② 安全確認（20点）", items: ["ミラー確認", "死角（目視）確認", "交差点確認", "歩行者確認"] },
+  { label: "③ 認知・判断（20点）", items: ["状況把握", "危険予測", "判断速度", "リスク予測"] },
+  { label: "④ ルール遵守（20点）", items: ["速度・信号", "一時停止", "優先道路", "車線変更"] },
+  { label: "⑤ リスク意識（20点）", items: ["車間距離", "防衛運転", "同乗者への配慮", "速度調整"] },
+];
+const SCORES = [5, 4, 3, 2, 0];
+const APTITUDE = ["注意力・集中力", "危険感受性", "感情コントロール", "安全意識"];
+const APT_LEVELS = ["高 / 良", "普通", "低 / 要注意"];
+const TENDENCY = ["慎重", "標準", "衝動的"];
+const RANK_TABLE = [
+  { min: 90, rank: "A", risk: "低", apt: "良好" },
+  { min: 85, rank: "B1", risk: "低", apt: "概ね良好" },
+  { min: 80, rank: "B2", risk: "中", apt: "要改善" },
+  { min: 60, rank: "C", risk: "高", apt: "要指導" },
+  { min: 0, rank: "D", risk: "高", apt: "要制限" },
+];
+const state = { scores: {}, aptitude: {}, tendency: null };
+const $ = (id) => document.getElementById(id);
+
+function seg(container, values, labels, onPick) {
+  values.forEach((v, i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = labels ? labels[i] : v;
+    b.addEventListener("click", () => {
+      container.querySelectorAll("button").forEach(x => x.classList.remove("on"));
+      b.classList.add("on"); onPick(v, i);
+    });
+    container.appendChild(b);
+  });
+}
+
+const catRoot = $("categories");
+CATEGORIES.forEach((cat, ci) => {
+  const div = document.createElement("div"); div.className = "cat";
+  div.innerHTML = '<p class="cat-title">' + cat.label + '</p>';
+  cat.items.forEach((name) => {
+    const row = document.createElement("div"); row.className = "item";
+    row.innerHTML = '<span class="name">' + name + '</span>';
+    const s = document.createElement("span"); s.className = "seg";
+    seg(s, SCORES, null, (v) => { state.scores[name] = v; recalc(); });
+    row.appendChild(s); div.appendChild(row);
+  });
+  const st = document.createElement("div"); st.className = "subtotal"; st.id = "sub" + ci; st.textContent = "小計 0 / 20";
+  div.appendChild(st); catRoot.appendChild(div);
+});
+
+const aptRoot = $("aptitude");
+APTITUDE.forEach((name) => {
+  const row = document.createElement("div"); row.className = "item";
+  row.innerHTML = '<span class="name">' + name + '</span>';
+  const s = document.createElement("span"); s.className = "seg seg3";
+  seg(s, [0, 1, 2], APT_LEVELS, (v) => { state.aptitude[name] = v; });
+  row.appendChild(s); aptRoot.appendChild(row);
+});
+seg(document.querySelector('[data-apt="tendency"]'), [0, 1, 2], TENDENCY, (v) => { state.tendency = v; });
+
+function recalc() {
+  let total = 0;
+  CATEGORIES.forEach((cat, ci) => {
+    const sub = cat.items.reduce((a, n) => a + (state.scores[n] || 0), 0);
+    $("sub" + ci).textContent = "小計 " + sub + " / 20";
+    total += sub;
+  });
+  $("total").textContent = total;
+  const r = RANK_TABLE.find(x => total >= x.min);
+  $("rank").value = r.rank;
+  $("risk").value = r.risk;
+  $("apt_summary").value = r.apt;
+  return total;
+}
+
+function fmtDate(iso) {
+  if (!iso) return "";
+  const [y, m, d] = iso.split("-").map(Number);
+  return y + "年" + m + "月" + d + "日";
+}
+
+function collect() {
+  const missing = [];
+  CATEGORIES.forEach(cat => cat.items.forEach(n => { if (state.scores[n] === undefined) missing.push(n); }));
+  APTITUDE.forEach(n => { if (state.aptitude[n] === undefined) missing.push(n); });
+  if (state.tendency === null) missing.push("判断傾向");
+  const total = recalc();
+  return {
+    missing,
+    data: {
+      company_short: $("company_short").value.trim(),
+      company: $("company").value.trim(),
+      department: $("department").value.trim(),
+      name: $("name").value.trim(),
+      date: fmtDate($("date").value),
+      instructor: $("instructor").value.trim(),
+      total, rank: $("rank").value, risk: $("risk").value, apt_summary: $("apt_summary").value,
+      categories: CATEGORIES.map(cat => ({
+        label: cat.label,
+        items: cat.items.map(n => [n, state.scores[n] || 0]),
+      })),
+      aptitude: APTITUDE.map(n => [n, state.aptitude[n] || 0]),
+      tendency: state.tendency || 0,
+      comments: { "講習評価": $("c1").value, "課題事項": $("c2").value, "留意事項": $("c3").value, "総合評価": $("c4").value },
+    },
+  };
+}
+
+function showMsg(text, ok) {
+  const m = $("msg"); m.textContent = text; m.className = "msg " + (ok ? "ok" : "err");
+}
+
+$("send").addEventListener("click", async () => {
+  const { data, missing } = collect();
+  if (missing.length) { showMsg("未入力の項目があります：" + missing.join("、"), false); return; }
+  const url = $("endpoint").value.trim();
+  if (!url) { showMsg("送信先URLが未設定です。コピーまたはダウンロードでデータを渡してください。", false); return; }
+  try {
+    await fetch(url, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(data) });
+    showMsg("送信しました。蓮が診断書PDFを作成します。", true);
+  } catch (e) {
+    showMsg("送信に失敗しました。コピー／ダウンロードでデータを渡してください。", false);
+  }
+});
+$("copy").addEventListener("click", async () => {
+  const { data } = collect();
+  await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+  showMsg("データをコピーしました。蓮に貼り付けて渡してください。", true);
+});
+$("download").addEventListener("click", () => {
+  const { data } = collect();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "shindansho_" + (data.name || "data") + ".json";
+  a.click(); URL.revokeObjectURL(a.href);
+});
+
+const DEFAULT_ENDPOINT = "https://script.google.com/macros/s/AKfycbw27Cun_iyCLSfQMnNk05eojUMANd2Jf2imNFRo2ZaogGAb6NynH28KDy1TaLT1Bpzd/exec";
+$("endpoint").value = localStorage.getItem("shindansho_endpoint") || DEFAULT_ENDPOINT;
+$("endpoint").addEventListener("change", () => localStorage.setItem("shindansho_endpoint", $("endpoint").value.trim()));
+$("date").value = new Date().toISOString().slice(0, 10);
+recalc();
+</script>
+</body>
+</html>
